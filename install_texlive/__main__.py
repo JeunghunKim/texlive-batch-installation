@@ -171,27 +171,12 @@ def main(timeout=3600):
         if args.install:
             additional_packages.extend(args.install.split(','))
 
-        if args.package_file:
-            with open(args.package_file, 'r') as f:
-                additional_packages.extend(f.read().splitlines())
-
-        if additional_packages:
-            log.info('Start installing addtional packages')
-            # tlmgr must always be up to date to install packages
-            sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
-            sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
-            log.info('Finished')
-
-        if args.link:
-            linkpath = '{}'.format(args.prefix or '/usr/local/texlive') + '/bin'
-            try:
-                os.symlink(bindir, linkpath)
-            except FileExistsError:
-                os.remove(linkpath)
-                os.symlink(bindir, linkpath)
-            finally:
-                log.info('Link finished')
-        break
+    if additional_packages:
+        log.info('Start installing additional packages')
+        # tlmgr must always be up to date to install packages
+        sp.run(['tlmgr', 'update', '--self'], env=env, check=True)
+        sp.run(['tlmgr', 'install', *additional_packages], env=env, check=True)
+        log.info('Finished')
 
 
 if __name__ == '__main__':
